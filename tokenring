@@ -1,0 +1,42 @@
+import java.util.Scanner;
+public class TokenRing {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner sc=new Scanner(System.in);
+		System.out.print("Enter the no. of nodes: ");
+		int n=sc.nextInt();
+		for(int i=0;i<n;i++)
+		{
+			System.out.print(i+"-> ");
+		}
+		System.out.println("0");
+
+		System.out.println("Enter the sender: ");
+		int sender=sc.nextInt();
+
+		System.out.println("Enter the reciever: ");
+		int reciever=sc.nextInt();
+
+		System.out.println("Enter the data: ");
+		int data=sc.nextInt();
+
+		int token=0;
+		System.out.println("Token passing");
+		for (int i=0;i!=sender;i=(i+1)%n)
+		{
+			System.out.print(i+"->");
+		}
+		System.out.println(sender);
+		
+		System.out.println("Sender entered the critical section");
+		System.out.println("Message passing");
+		for (int i=(sender+1)%n;i!=reciever;i=(i+1)%n)
+		{
+			System.out.print(i+"->");
+		}
+		System.out.println(reciever);
+		System.out.println("Reciever recieved the data!");
+	}
+
+}
