@@ -1,0 +1,12 @@
+sudo apt update
+sudo apt install openjdk-8-jdk
+java -version
+sudo update-alternatives --config java
+java -version
+
+sudo apt update
+sudo apt install openmpi-bin openmpi-common libopenmpi-dev
+mpicc --version
+
+https://mpj-express.org/
+donload and extract
