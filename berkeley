@@ -1,0 +1,53 @@
+import java.util.Scanner;
+public class Main {
+
+	public static void main(String[] args) {
+		System.out.println("Enter the number of clients: ");
+		Scanner sc=new Scanner(System.in);
+		int n=sc.nextInt();
+
+		System.out.println("Enter the server time(HH:MM): ");
+		String[] servertime=sc.next().split(":");
+
+		int servermin=Integer.parseInt(servertime[0])*60+Integer.parseInt(servertime[1]);
+		int[] clientmin=new int[n];
+		for(int i=0;i<n;i++)
+		{
+			System.out.println("Enter the client "+(i+1)+"time(HH:MM): ");
+			String[] clienttime=sc.next().split(":");
+			clientmin[i]=Integer.parseInt(clienttime[0])*60+Integer.parseInt(clienttime[1]);
+		}
+
+		System.out.printf("Server time before synchronisation is: %02d:%02d ",servermin/60,servermin%60);
+		for(int i=0;i<n;i++)
+		{
+			System.out.printf("Client "+(i+1)+" time before synchronisation is: %02d:%02d ",clientmin[i]/60,clientmin[i]%60);
+		}
+		int[] diff=new int[n];
+		int sum=0;
+		for(int i=0;i<n;i++)
+		{
+			diff[i]=clientmin[i]-servermin;
+			sum+=diff[i];
+		}
+		int avg=(sum)/(n+1);
+		int[] adj=new int[n];
+		for(int i=0;i<n;i++)
+		{
+			adj[i]=avg-diff[i];
+		}
+		
+		servermin+=avg;
+		for(int i=0;i<n;i++)
+		{
+			clientmin[i]+=adj[i];
+		}
+		System.out.printf("Server after synchronisation: %02d:%02d \n",servermin/60,servermin%60);
+		
+		for(int i=0;i<n;i++)
+		{
+			System.out.printf("Client after synchronisation: %02d:%02d \n\n",clientmin[i]/60,clientmin[i]%60);
+		}
+	}
+
+}
