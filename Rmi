@@ -1,0 +1,70 @@
+Client.java
+import java.rmi.*;
+import java.util.Scanner;
+public class Client {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try
+		{
+			String serverUrl="rmi://localhost/Server";
+			ServerIntf serverIntf=(ServerIntf) Naming.lookup(serverUrl);
+
+			Scanner sc=new Scanner(System.in);
+			System.out.println("Enter str1: ");
+			String str1=sc.nextLine();
+			System.out.println("Enter str2: ");
+			String str2=sc.nextLine();
+
+			System.out.println(serverIntf.strjoin(str1, str2));
+		}
+		catch(Exception e)
+		{
+			System.out.println("Client throws exception"+e.getMessage());
+		}
+	}
+
+}
+
+Server.java
+import java.rmi.*;
+public class Server {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try
+		{
+			ServerImpl serverImpl=new ServerImpl();
+			Naming.rebind("Server", serverImpl);
+			System.out.println("Server started.....");
+		}
+		catch(Exception e)
+		{
+			System.out.println("Server throws error "+e.getMessage());
+		}
+	}
+
+}
+
+ServerImpl.java
+import java.rmi.*;
+import java.rmi.server.UnicastRemoteObject;
+public class ServerImpl extends UnicastRemoteObject implements ServerIntf{
+	public ServerImpl() throws RemoteException
+	{
+
+	}
+	public String strjoin(String str1,String str2) throws RemoteException
+	{
+		String result=str1+str2;
+		return result;
+	}
+
+}
+
+ServerIntf.java
+import java.rmi.*;
+public interface ServerIntf extends Remote
+{
+	public String strjoin(String str1,String str2) throws RemoteException;
+}
