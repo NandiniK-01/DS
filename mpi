@@ -1,0 +1,42 @@
+import mpi.*;
+public class DistriutedSum {
+
+	public static void main(String[] args) throws MPIException{
+
+		MPI.Init(args);
+		int size=MPI.COMM_WORLD.Size();
+
+		int rank=MPI.COMM_WORLD.Rank();
+
+		int[] array= {1,2,3,4,5,6,7,8,9,10};
+		int n=array.length;
+		int local_n=n/size;
+		int remainder=n%size;
+
+		int[] local_array=new int[local_n+(rank<remainder?1:0)];
+		int offset=local_n*rank+Math.min(rank, remainder);
+
+		int[] local_sum=new int[size];
+		int sum=0;
+		for(int i=0;i<local_array.length;i++)
+		{
+			local_array[i]=array[i+offset];
+			sum+=local_array[i];
+		}
+		int[] global_sums=new int[size];
+		MPI.COMM_WORLD.Allgather(new int[] {sum},0,1,MPI.INT,global_sums,0,1,MPI.INT);
+
+		if(rank==0)
+		{
+			int fsum=0;
+			for(int i=0;i<size;i++)
+			{
+				System.out.println(global_sums[i]);
+				fsum+=global_sums[i];
+			}
+			System.out.println("fsum "+fsum);
+		}
+		MPI.Finalize();
+	}
+
+}
