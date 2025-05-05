@@ -1,0 +1,149 @@
+Server.java
+package calculatorApp;
+import calculatorApp.CalculatorHelper;
+import calculatorApp.Calculator;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+
+public class Server {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try {
+		ORB orb=ORB.init(args,null);
+		POA rootPOA=POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+		rootPOA.the_POAManager().activate();
+		
+		CalculatorImpl calculator=new CalculatorImpl(orb);
+		org.omg.CORBA.Object ref=rootPOA.servant_to_reference(calculator);
+		Calculator href=CalculatorHelper.narrow(ref);
+		org.omg.CORBA.Object objRef=orb.resolve_initial_references("NameService");
+		NamingContextExt ncref=NamingContextExtHelper.narrow(objRef);
+		
+		NameComponent[] Path=ncref.to_name("ABC");
+		ncref.rebind(Path,href);
+		
+		System.out.println("server started and waiting ");
+		while(true)
+		{
+			orb.run();
+		}
+		
+	}
+		catch(Exception e)
+		{
+			System.out.println("Server error" + e);
+		}
+}
+}
+
+
+Client.java
+package calculatorApp;
+
+import java.util.Scanner;
+
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+
+public class Client {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		try {
+		ORB orb=ORB.init(args,null);
+		org.omg.CORBA.Object objRef= orb.resolve_initial_references("NameService");
+		NamingContextExt ncref=NamingContextExtHelper.narrow(objRef);
+		
+		Calculator calculator=CalculatorHelper.narrow(ncref.resolve_str("ABC"));
+		int ch;
+		Scanner sc=new Scanner(System.in);
+		do{
+			System.out.println("1. Add");
+			System.out.println("2. Substract");
+		System.out.println("3. Multiply");
+		System.out.println("4. Divide");
+		System.out.println("5. Quit");
+		System.out.println("Enter choice : ");
+		ch=sc.nextInt();
+		System.out.println("Enter first Number : ");
+		double x=sc.nextDouble();
+		System.out.println("Enter Second Number : ");
+		double y=sc.nextDouble();
+		
+		switch(ch)
+		{
+		case 1 : System.out.println(calculator.add(x, y));
+				break;
+		case 2 : System.out.println(calculator.subtract(x, y));
+				break;
+		case 3 : System.out.println(calculator.multiply(x, y));
+				break;
+		case 4 : System.out.println(calculator.divide(x, y));
+				break;
+		}
+		}while(ch!=5);
+		}
+		catch(Exception e)
+		{
+			System.out.println("Cleint error" + e);
+		}
+		
+	}
+	
+
+}
+
+
+CalculatorImpl.java
+package calculatorApp;
+
+import org.omg.CORBA.ORB;
+
+public class CalculatorImpl extends CalculatorPOA{
+	private ORB orb;
+	public CalculatorImpl(ORB orb)
+	{
+		super();
+		this.orb=orb;
+	}
+	public double add(double x,double y)
+	{
+		return x+y;
+	}
+	public double subtract(double x,double y)
+	{
+		return x-y;
+	}
+	public double multiply(double x,double y)
+	{
+		return x*y;
+	}
+	public double divide(double x,double y)
+	{
+		return x/y;
+	}
+	public void shutdown()
+	{
+		orb.shutdown(false);
+	}
+}
+
+
+Calculator.idl
+module calculatorApp
+{
+	interface Calculator
+	{
+		double add(in double x,in double y);
+		double subtract(in double x,in double y);
+		double multiply(in double x,in double y);
+		double divide(in double x,in double y);
+		oneway void shutdown();
+	};
+};
